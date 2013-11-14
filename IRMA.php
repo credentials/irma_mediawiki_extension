@@ -40,6 +40,8 @@ set_include_path( implode( PATH_SEPARATOR, array( $path ) ) . PATH_SEPARATOR . g
  */
 $wgIRMACookieExpiration = 365 * 24 * 60 * 60;
 
+$wgIRMAWebService = "http://localhost:8080/irma_web_service";
+
 # END CONFIGURATION VARIABLES
 
 $wgExtensionCredits['other'][] = array(
@@ -60,36 +62,30 @@ $wgAutoloadClasses['SpecialIRMACreateAccount'] = $dir . 'IRMA.hooks.php';
 $wgAutoloadClasses['SpecialIRMAUserLogin'] = $dir . 'IRMA.hooks.php';
 
 # Autoload common parent with utility methods
-$wgAutoloadClasses['SpecialIRMA'] = $dir . 'SpecialIRMA.body.php';
+$wgAutoloadClasses['SpecialIRMALogin'] = $dir . 'IRMA.body.php';
 
-$wgAutoloadClasses['SpecialIRMALogin'] = $dir . 'SpecialIRMALogin.body.php';
 $wgAutoloadClasses['IRMAUsercreateTemplate'] = $dir . 'templates/Usercreate.php';
-$wgAutoloadClasses['SpecialIRMACreate'] = $dir . 'SpecialIRMACreate.body.php';
 
 $wgHooks['BeforePageDisplay'][] = 'IRMAHooks::onBeforePageDisplay';
 $wgHooks['SpecialPage_initList'][] = 'IRMAHooks::onSpecialPage_initList';
-$wgHooks['LoadExtensionSchemaUpdates'][] = 'IRMAHooks::onLoadExtensionSchemaUpdates';
-
-$wgHooks['DeleteAccount'][] = 'IRMAHooks::onDeleteAccount';
-$wgHooks['MergeAccountFromTo'][] = 'IRMAHooks::onMergeAccountFromTo';
 
 $myResourceTemplate = array(
-	'localBasePath' => $path . '/skin',
-	'remoteExtPath' => 'IRMA/skin',
+	'localBasePath' => $path,
+	'remoteExtPath' => 'IRMA/',
 	'group' => 'ext.irma',
 );
 
 $wgResourceModules['ext.irma.login'] = $myResourceTemplate + array(
-	'scripts' => 'IRMA.login.js',
-	'styles' => 'IRMA.css',
+	'scripts' => 'js/ext.irma.login.js',
+	'styles' => 'css/ext.irma.css',
 	'dependencies' => array(
 		'jquery'
 	)
 );
 
 $wgResourceModules['ext.irma.special.userlogin.signup'] = $myResourceTemplate + array(
-	'scripts' => 'IRMA.register.js',
-	'styles' => 'IRMA.css',
+	'scripts' => 'js/ext.irma.signup.js',
+	'styles' => 'css/ext.irma.css',
 	'dependencies' => array(
 		'jquery'
 	)

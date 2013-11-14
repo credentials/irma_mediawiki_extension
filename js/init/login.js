@@ -4,9 +4,10 @@
  */
 function onDocumentReady() {
 	ProxyReader.channelBaseURL = "http://irp.vullersweb.nl/create";
-	IRMA.base_url = "http://localhost:8080/irma_web_service/protocols/verification/IRMAWiki";
-	IRMA.irma_html = "/mediawiki/extensions/IRMA/skin/html/";
-	IRMA.verifier_logo = "/mediawiki/extensions/IRMA/skin/img/IRMAWiki_verifier.png";
+	IRMAURL.base = "http://localhost:8080/irma_web_service";
+	IRMAURL.action = IRMAURL.base + "/protocols/verification/IRMAWiki";
+	IRMAURL.html = "/mediawiki/extensions/IRMA/html";
+	IRMAURL.verifierLogo = "/mediawiki/extensions/IRMA/img/IRMAWiki_verifier.png";
 	IRMA.init();
 	IRMA.onBackButtonPressed = function(data) {
 		IRMA.hide_verify();

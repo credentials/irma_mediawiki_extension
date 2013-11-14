@@ -262,7 +262,9 @@ var ProxyReader = {
 	},
 };
   var SmartCardHandler = {
-		  
+
+			cardVersion: "",
+
 		  init: function(applet) {
 			  this.waitTime = 100;
 			  this.applet = applet;
@@ -301,15 +303,20 @@ var ProxyReader = {
 		  selectApplet: function(aid, success, failure) {
 			  var hexlength = (aid.length/2).toString(16),
 			  	  selectAPDU = '00A40400' + (hexlength.length == 1 ? '0' : '') + hexlength + aid + '00';
-			  if(this.transmit(selectAPDU).slice(-4) === '9000') {
-				  success();
+			  rapdu = this.transmit(selectAPDU);
+              console.log("response: " + rapdu);
+			  if( rapdu.slice(-4) === '9000' ) {
+				SmartCardHandler.cardVersion = rapdu.slice(0, rapdu.length - 4);
+				success();
 			  } else {
-				  failure();
-			  };
+			  	failure();
+			  }
 		  },
 		  transmit: function(command) {
 			  console.log("Transmit: " + command);
-			  return this.applet.transmitString(command);
+			  response = this.applet.transmitString(command);
+			  console.log("Response: " + response)
+			  return response;
 		  },
 		  sendFeedback: function(message, state) {
 			// Not possible on normal cardreaders
@@ -925,16 +932,20 @@ var ProxyReader = {
   return mustache;
 
 }())));
+var IRMAURL = new Object();
+IRMAURL.base = "/irma_web_service";
+IRMAURL.action = IRMAURL.base + "/protocols/verification/SpuitenEnSlikken";
+IRMAURL.html = IRMAURL.base + "/irma";
+IRMAURL.icon = IRMAURL.base + "/img";
+IRMAURL.issuerLogo = IRMAURL.base + "/img/RU_logo_issuer.png";
+IRMAURL.verifierLogo = IRMAURL.base + "/img/RU_logo_verifier.png";
+
 var IRMA = {
-	base_url: "/irma_web_service/protocols/verification/SpuitenEnSlikken",
-	irma_html: "../../irma/",
 	irma_aid: 'F849524D4163617264',
 	irma_aid_0_7: '49524D4163617264',
 
 	// Target to go to after issuing is done
 	after_issue_target: "http://www.ru.nl/cybersecurity",
-	issuer_logo: "../../img/RU_logo_issuer.png",
-	verifier_logo: "../../img/RU_logo_verifier.png",
 
 	irma_issue_state: 'idle',
 	issue_url: '',
@@ -956,9 +967,9 @@ var IRMA = {
 	onBackButtonPressed: function() {},
 
 	init: function() {
-		IRMA.load_extra_html(IRMA.irma_html + "issue.html");
-		IRMA.load_extra_html(IRMA.irma_html + "verify.html");
-		IRMA.load_extra_html(IRMA.irma_html + "qr.html");
+		IRMA.load_extra_html(IRMAURL.html + "/issue.html");
+		IRMA.load_extra_html(IRMAURL.html + "/verify.html");
+		IRMA.load_extra_html(IRMAURL.html + "/qr.html");
 
 		// Initialize readers
 		ProxyReader.init();
@@ -1011,7 +1022,7 @@ var IRMA = {
 		console.log("Starting IRMA verification");
 
 		IRMA.setup_qr();
-		$("#IRMA_verifier_logo_img").prop("src", IRMA.verifier_logo);
+		$("#IRMA_verifier_logo_img").prop("src", IRMAURL.verifierLogo);
 		IRMA.show_verify();
 		IRMA.retrieve_verifications();
 
@@ -1039,7 +1050,7 @@ var IRMA = {
 	retrieve_verifications: function() {
 		console.log("Retrieving verification information");
 		$.ajax({
-			url: IRMA.base_url,
+			url: IRMAURL.action,
 			contentType: 'application/json',
 			type: 'POST',
 			success: function(data) {
@@ -1075,6 +1086,7 @@ var IRMA = {
 		$("#IRMA_button_verify").html("VERIFYING...");
 
 		IRMA.Handler.bind("cardRemoved", function() {});
+
 		$.ajax({
 			url : IRMA.responseurl,
 			contentType : 'application/json',
@@ -1089,9 +1101,19 @@ var IRMA = {
 				IRMA.current_verification_idx = 0;
 				IRMA.responseurl = data.responseurl;
 
-				IRMA.verifyStepOne();
+		    IRMA.Handler.verifyPin(IRMA.verify_start);
 			}
 		});
+	},
+
+	verify_start: function(response) {
+		console.log("Pin verified", response);
+		if(response.arguments.result === "success") {
+      IRMA.verifyStepOne();
+		} else {
+			// FIXME Do some error handling
+			// TODO test blocking pin and feedback for that
+		}
 	},
 
 	// Select next set of commands to send
@@ -1178,7 +1200,7 @@ var IRMA = {
 	},
 
 	start_batch_issue: function(selection, issue_url) {
-		$("#IRMA_issuer_logo_img").prop("src", IRMA.issuer_logo);
+		$("#IRMA_issuer_logo_img").prop("src", IRMAURL.issuerLogo);
 		IRMA.show_issue();
 		IRMA.selection = selection;
 		IRMA.issue_url = issue_url;
@@ -1198,7 +1220,7 @@ var IRMA = {
 		IRMA.bindCallback("cardInserted", IRMA.createCardInsertedCallback(function() {
 			IRMA.Handler.selectApplet(IRMA.irma_aid, IRMA.enable_issue, function() {
 				IRMA.Handler.selectApplet(IRMA.irma_aid_0_7, IRMA.enable_issue, function() {
-					$("#IRMA_status_icon").prop("src", "../../img/irma_icon_warning_520px.png");
+					$("#IRMA_status_icon").prop("src", IRMAURL.icon + "/irma_icon_warning_520px.png");
 					$("#IRMA_status_text").html("Inserted card is not an IRMA card");
 				});
 			});
@@ -1389,7 +1411,7 @@ var IRMA = {
 	},
 
 	disableVerify: function () {
-		$("#IRMA_status_icon").prop("src", "../../img/irma_icon_waiting_520px.png");
+		$("#IRMA_status_icon").prop("src", IRMAURL.icon + "/irma_icon_waiting_520px.png");
 		$("#IRMA_status_text").html("Insert your IRMA card or use your phone");
 		$("#IRMA_button_verify").off("click");
 		$("#IRMA_button_verify").removeClass("enabled");
@@ -1397,7 +1419,7 @@ var IRMA = {
 	},
 
 	enableVerify: function() {
-		$("#IRMA_status_icon").prop("src", "../../img/irma_icon_ready_520px.png");
+		$("#IRMA_status_icon").prop("src", IRMAURL.icon + "/irma_icon_ready_520px.png");
 		$("#IRMA_status_text").html("Hit 'VERIFY' to check your credential");
 		$("#IRMA_button_verify").html("VERIFY");
 		$("#IRMA_button_verify").addClass("enabled");
@@ -1430,7 +1452,7 @@ var IRMA = {
 
 	onVerifySuccess: function(data) {
 		console.log("Internal on verify succes function called");
-		$("#IRMA_status_icon").prop("src", "../../img/irma_icon_ok_520px.png");
+		$("#IRMA_status_icon").prop("src", IRMAURL.icon + "/irma_icon_ok_520px.png");
 		$("#IRMA_status_text").html("Hit 'CONTINUE' to proceed to the website");
 		$("#IRMA_button_verify").html("CONTINUE");
 		$("#IRMA_button_verify").addClass("enabled");
@@ -1441,7 +1463,7 @@ var IRMA = {
 	},
 
 	show_warning: function(text) {
-        $("#IRMA_status_icon").prop("src", "../../img/irma_icon_warning_520px.png");
+        $("#IRMA_status_icon").prop("src", IRMAURL.icon + "/irma_icon_warning_520px.png");
         $("#IRMA_status_text").html(text);
         IRMA.Handler.sendFeedback(text, "warning");
 	},
@@ -1455,14 +1477,14 @@ var IRMA = {
 	},
 
 	show_error: function(text, status) {
-		$("#IRMA_status_icon").prop("src", "../../img/irma_icon_warning_520px.png");
+		$("#IRMA_status_icon").prop("src", IRMAURL.icon + "/irma_icon_warning_520px.png");
 		$("#IRMA_status_text").html(text);
 		$("#IRMA_button_verify").html(status);
 		IRMA.Handler.sendFeedback(text, "failure");
 	},
 
 	show_failure: function(text, status) {
-		$("#IRMA_status_icon").prop("src", "../../img/irma_icon_missing_520px.png");
+		$("#IRMA_status_icon").prop("src", IRMAURL.icon + "/irma_icon_missing_520px.png");
 		$("#IRMA_status_text").html(text);
 		IRMA.Handler.sendFeedback(text, "failure");
 		$("#IRMA_button_verify").html(status);
@@ -1521,21 +1543,64 @@ var IRMA = {
 //    IRMA.show();
 //});
 
+var start_issuance = function(data) {
+	console.log(data);
+	var credentials = data.info.issue_information;
+	console.log(credentials);
+	IRMA.hide_verify();
+	IRMA.start_batch_issue(Object.keys(credentials), issue_url);
+}
+
 /**
  * Initialise the IRMA JavaScript components for MediaWiki
  */
 function onDocumentReady() {
 	ProxyReader.channelBaseURL = "http://irp.vullersweb.nl/create";
-	IRMA.base_url = "http://localhost:8080/irma_web_service/protocols/verification/IRMAWiki";
+	IRMA.base_url = "http://localhost:8080/irma_web_service/protocols/verification/IRMAWikiRegistration";
 	IRMA.irma_html = "/mediawiki/extensions/IRMA/skin/html/";
 	IRMA.verifier_logo = "/mediawiki/extensions/IRMA/skin/img/IRMAWiki_verifier.png";
+	IRMA.issuer_logo = "/mediawiki/extensions/IRMA/skin/img/IRMAWiki_issuer.png";
+
+	var path = document.location.pathname;
+	var rootpath = path.substring(0, path.lastIndexOf('/'))
+	IRMA.after_issue_target = rootpath;
+
 	IRMA.init();
+
+	IRMA.onVerifySuccess = function(data) {
+		console.log(data);
+		var issueData = new Object();
+    issueData.nickname = $("#wpName2").attr("value");
+    issueData.realname = $("#wpRealName").attr("value");
+    console.log(issueData);
+		issue_url = data.result;
+		issue_data = issueData;
+		$.ajax({
+		  headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+			url: data.result,
+			data: JSON.stringify(issueData),
+			type: 'POST',
+			success: start_issuance,
+		});
+	}
+
 	IRMA.onBackButtonPressed = function(data) {
 		IRMA.hide_verify();
+		IRMA.hide_issue();
 	}
-	$("#verify").on('click', function(event) {
+
+	$("#wpCreateaccount").on('click', function(event) {
 		IRMA.start_verify();
+		return false;
 	});
+	$("#userlogin2").on('submit', function(event) {
+		IRMA.start_verify();
+		return false;
+	});
+
 }
 
 $( document ).ready( onDocumentReady );
