@@ -30,7 +30,7 @@ class SpecialIRMALogin extends SpecialPage {
 
   var $mUsername, $mReturnTo, $mPosted;
   var $mAction, $mCreateaccount;
-  var $mLoginattempt;
+  var $mLoginattempt, $mEmail, $mReason;
   var $mReturnToQuery, $mToken, $mStickHTTPS;
   var $mType, $mRealName;
   var $mAbortLoginErrorMsg = 'login-abort-generic';
@@ -219,6 +219,21 @@ class SpecialIRMALogin extends SpecialPage {
     $out->addHTML($this->htmlSmartCardJSApplet());
   }
 
+  function finishSignup($par) {
+    # Now create a dummy user ($u) and check if it is valid
+    $name = trim( $this->mUsername );
+    $u = User::newFromName( $name, 'creatable' );
+    $u->setEmail( $this->mEmail );
+    $u->setRealName( $this->mRealName );
+    $u->addToDatabase();
+    $u->setToken();
+    $u->setCookies();
+    $u->saveSettings();
+    global $wgUser;
+    $wgUser = $u;
+    $this->displaySuccessSignup();
+  }
+
   function htmlVerifyButton() {
     global $wgScriptPath;
 
@@ -254,9 +269,10 @@ class SpecialIRMALogin extends SpecialPage {
     // Constructs an empty user
     $user = User::newFromName( $iwAttributeStore['nickname'] );
     $user->load();
-    $user->mId = hexdec( MWCryptRand::generateHex( 8 ) );
+    //$user->mId = hexdec( MWCryptRand::generateHex( 8 ) );
     $user->setToken();
     $user->setCookies();
+    $user->saveSettings();
 
     if ( $user instanceof User ) {
       $wgUser = $user;
@@ -273,6 +289,7 @@ class SpecialIRMALogin extends SpecialPage {
     global $wgUser, $wgOut;
 
     $this->setupSession();
+    $this->getContext()->setUser( $wgUser );
     RequestContext::getMain()->setUser( $wgUser );
 
     # Run any hooks; ignore results
@@ -286,6 +303,27 @@ class SpecialIRMALogin extends SpecialPage {
     $wgOut->addHtml( $inject_html );
     list( $returnto, $returntoquery ) = $this->returnTo();
     $wgOut->returnToMain( null, $returnto, $returntoquery );
+  }
+
+
+  /**
+   * Display the final "Successful signup"
+   */
+  function displaySuccessSignup() {
+    global $wgUser, $wgOut;
+
+    $this->setupSession();
+    $this->getContext()->setUser( $wgUser );
+    RequestContext::getMain()->setUser( $wgUser );
+
+    # Run any hooks; ignore results
+		wfRunHooks( 'AddNewAccount', array( $wgUser, false ) );
+
+    # Confirm that the account was created
+		$wgOut->setPageTitle( $this->msg( 'irmaaccountcreated' ) );
+		$wgOut->addWikiMsg( 'irmaaccountcreatedtext', $wgUser->getName() );
+		$wgOut->addReturnTo( $this->getTitle() );
+		$wgUser->addNewUserLogEntry( 'create2', $this->mReason );
   }
 
   /**
@@ -344,9 +382,9 @@ class SpecialIRMALogin extends SpecialPage {
       'classid' => 'clsid:8AD9C840-044E-11D1-B3E9-00805F499D93',
       'height' => $height,
       'width' => $width
-      ), 
-      Html::rawElement('param', array( 
-        'name' => 'code', 
+      ),
+      Html::rawElement('param', array(
+        'name' => 'code',
         'value' => $code )) .
       Html::rawElement('param', array(
         'name' => 'archive',

@@ -3,7 +3,7 @@
  * Initialise the IRMA JavaScript components for MediaWiki
  */
 function onDocumentReady() {
-	ProxyReader.channelBaseURL = "http://irp.vullersweb.nl/create";
+	ProxyReader.channelBaseURL = "http://tomcat.demo.irmacard.org/irma_web_relay/create";
 	IRMAURL.base = "http://localhost:8080/irma_web_service";
 	IRMAURL.action = IRMAURL.base + "/protocols/verification/IRMAWiki";
 	IRMAURL.html = "/mediawiki/extensions/IRMA/html";

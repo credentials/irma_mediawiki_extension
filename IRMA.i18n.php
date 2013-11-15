@@ -25,10 +25,7 @@
 $messages = array();
 
 /** English
- * @author Evan Prodromou <evan@prodromou.name>
- * @author Sergey Chernyshev
- * @author Alexandre Emsenhuber
- * @author Thomas Gries
+ * @author Pim Vullers <pim@cs.ru.nl>
  */
 $messages['en'] = array(
 	'irma-desc' => 'Let users log in to the wiki with their [//irmacard.org/ IRMA card].',
@@ -38,34 +35,19 @@ $messages['en'] = array(
 	'irma-verify-credential' => 'Verify IRMAwiki credential',
 	'irmaerror' => 'Verification error',
 	'irmaerrortext' => 'An error occurred during verification of the IRMA URL.',
-	'irma-error-no-auth' => 'An unspecified authentication response/request error occurred during the verification of the IRMA URL $1.',
-	'irma-error-server-response' => "An error occurred during the verification of the IRMA URL $1.
-
-The server response was: ''$2''",
-	'irma-error-request-forgery' => 'An error occurred: an invalid token was found.',
-	'irma-error-wrong-force-provider-setting' => 'An internal error occured: an incorrect URL value has been found for the forced provider "$1".',
-	'irma-error-irma-convert-not-allowed-forced-provider' => "It is not possible to associate further IRMAs to your account, because you can only use the ''\"forced\"'' IRMA provider \"$1\" for logins on this Wiki.",
+  'irmaaccountcreated' => 'Account created',
+  'irmaaccountcreatedtext' => 'The user account for $1 has been created.',
 	'irmaconfigerror' => 'IRMA configuration error',
 	'irmaconfigerrortext' => 'The IRMA storage configuration for this wiki is invalid.
 Please consult an [[Special:ListUsers/sysop|administrator]].',
-	'irmapermission' => 'IRMA permissions error',
-	'irmapermissiontext' => 'The IRMA you provided is not allowed to login to this server.',
 	'irmacancel' => 'Verification cancelled',
 	'irmacanceltext' => 'Verification of the IRMA URL was cancelled.',
 	'irmafailure' => 'Verification failed',
 	'irmafailuretext' => 'Verification of the IRMA URL failed.
 Error message: "$1"',
 	'irmasuccess' => 'Verification succeeded',
-	'irmasuccesstext' => "'''Successful verification and log in as user $1 with ID $2'''.
-
-This and optional further IRMAs can be managed in the [[Special:Preferences#mw-prefsection-irma|IRMA tab]] of your preferences.<br />
-An optional account password can be added in your [[Special:Preferences#mw-prefsection-personal|User profile]].",
-	'irmausernameprefix' => 'IRMAUser',
-	'irmaserverlogininstructions' => '$3 requests that you enter your password for your user $2 page $1 (this is your IRMA URL)',
-	'irmatrustinstructions' => 'Check if you want to share data with $1.',
-	'irmaallowtrust' => 'Allow $1 to trust this user account.',
-	'irmanopolicy' => 'Site has not specified a privacy policy.',
-	'irmapolicy' => 'Check the <a target="_new" href="$1">privacy policy</a> for more information.',
+	'irmasuccesstext' => "'''Successful verification and log in as user $1'''.
+	You can now edit protected pages.",
 	'irmaoptional' => 'Optional',
 	'irmarequired' => 'Required',
 	'irmanickname' => 'Nickname',
@@ -73,50 +55,14 @@ An optional account password can be added in your [[Special:Preferences#mw-prefs
 	'irmaemail' => 'Email address',
 	'irmalanguage' => 'Language',
 	'irmatimezone' => 'Time zone',
-	'irmachooselegend' => 'Username and account choice',
-	'irmachooseinstructions' => 'All users need a nickname;
-you can choose one from the options below.',
 	'irmachoosenick' => 'Your nickname ($1)',
 	'irmachoosefull' => 'Your real name ($1)',
-	'irmachooseurl' => 'A name picked from your IRMA ($1)',
-	'irmachooseauto' => 'An auto-generated name ($1)',
-	'irmachoosemanual' => 'A name of your choice:',
-	'irmachooseexisting' => 'An existing account on this wiki',
 	'irmachooseusername' => 'Username:',
 	'irmachoosepassword' => 'Password:',
-	'irmaconvertinstructions' => 'This form lets you change your user account to use an IRMA URL or add more IRMA URLs',
-	'irmaconvertoraddmoreids' => 'Convert to IRMA or add another IRMA URL',
-	'irmaconvertsuccess' => 'Successfully converted to IRMA',
-	'irmaconvertsuccesstext' => 'You have successfully converted your IRMA to $1.',
-	'irma-convert-already-your-irma-text' => 'The IRMA $1 is already associated to your account.',
-	'irma-convert-other-users-irma-text' => '$1 is someone else\'s IRMA.
-You cannot use the IRMA of another user.',
 	'irmaalreadyloggedin' => 'You are already logged in',
 	'irmaalreadyloggedintext' => "'''You are already logged in, $1!'''",
-	'irmanousername' => 'No username specified.',
-	'irmabadusername' => 'Bad username specified.',
-	'irmaautosubmit' => 'This page includes a form that should be automatically submitted if you have JavaScript enabled.
-If not, try the "Continue" button.',
-	'irmaclientonlytext' => 'You cannot use accounts from this wiki as IRMAs on another site.',
-	'irmaloginlabel' => 'IRMA URL',
 	'irmaregisterinstructions' => '{{SITENAME}} uses the [//irmacard.org/ IRMA] technology for secure and privacy-friendly authentication on this wiki.',
 	'irmalogininstructions' => '{{SITENAME}} uses the [//irmacard.org/ IRMA] technology for secure and privacy-friendly authentication on this wiki. In order to login, present your IRMA card in order to verify your IRMAwiki credential. If you do not yet have an IRMAwiki credential, [[Special:UserCreate|register]] first.',
-	'irmalogininstructions-irmaloginonly' => "{{SITENAME}} ''only'' allows you to log in with IRMA.",
-	'irmalogininstructions-passwordloginallowed' => 'If you already have an account on {{SITENAME}}, you can [[Special:UserLogin|log in]] with your username and password as usual.
-To use IRMA in the future, you can [[Special:IRMAConvert|convert your account to IRMA]] after you have logged in normally.',
-	'irmaupdateuserinfo' => 'Update my personal information:',
-	'irmadelete' => 'Delete IRMA',
-	'irmadelete-text' => 'By clicking the "{{int:irmadelete-button}}" button, you will remove the IRMA "$1" from your account.
-You will no longer be able to log in with this IRMA.',
-	'irmadelete-button' => 'Confirm',
-	'irmadeleteerrornopassword' => 'You cannot delete all your IRMAs because your account has no password.
-You would not able to log in without an IRMA.',
-	'irmadeleteerrorirmaonly' => 'You cannot delete all your IRMAs because you are only allowed to log in with IRMA.
-You would not able to log in without an IRMA.',
-	'irmadelete-success' => 'The IRMA has been successfully removed from your account.',
-	'irmadelete-error' => 'An error occurred while removing the IRMA from your account.',
-	'irma-irmas-were-not-merged' => 'IRMA(s) were not merged when merging the user accounts.',
-
 	'prefs-irma' => 'IRMA',
 	'prefs-irma-hide-irma' => 'IRMA URL on your user page',
 	'prefs-irma-userinfo-update-on-login' => 'IRMA user information update',

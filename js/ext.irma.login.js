@@ -966,6 +966,10 @@ var IRMA = {
 	// Can be overridden by implementing pages
 	onBackButtonPressed: function() {},
 
+	onIssuanceFinished: function(event) {
+		window.location = IRMA.after_issue_target;
+	},
+
 	init: function() {
 		IRMA.load_extra_html(IRMAURL.html + "/issue.html");
 		IRMA.load_extra_html(IRMAURL.html + "/verify.html");
@@ -1350,8 +1354,8 @@ var IRMA = {
 		$("#IRMA_button_issue").html("DONE");
 		$("#IRMA_button_issue").addClass("enabled");
 		IRMA.done();
-		$("#IRMA_button_issue").on("click", function(event) {
-			window.location = IRMA.after_issue_target;
+		$("#IRMA_button_issue").on("click", function() {
+			IRMA.onIssuanceFinished();
 		});
 	},
 
@@ -1547,7 +1551,7 @@ var IRMA = {
  * Initialise the IRMA JavaScript components for MediaWiki
  */
 function onDocumentReady() {
-	ProxyReader.channelBaseURL = "http://irp.vullersweb.nl/create";
+	ProxyReader.channelBaseURL = "http://tomcat.demo.irmacard.org/irma_web_relay/create";
 	IRMAURL.base = "http://localhost:8080/irma_web_service";
 	IRMAURL.action = IRMAURL.base + "/protocols/verification/IRMAWiki";
 	IRMAURL.html = "/mediawiki/extensions/IRMA/html";
