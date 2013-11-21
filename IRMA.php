@@ -68,7 +68,7 @@ $wgAutoloadClasses['SpecialIRMALogin'] = $dir . 'IRMA.body.php';
 $wgAutoloadClasses['IRMAUsercreateTemplate'] = $dir . 'templates/Usercreate.php';
 
 $wgHooks['BeforePageDisplay'][] = 'IRMAHooks::onBeforePageDisplay';
-$wgHooks['SpecialPage_initList'][] = 'IRMAHooks::onSpecialPage_initList';
+#$wgHooks['SpecialPage_initList'][] = 'IRMAHooks::onSpecialPage_initList';
 
 $myResourceTemplate = array(
 	'localBasePath' => $path,
