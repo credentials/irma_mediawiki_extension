@@ -18,7 +18,7 @@ class SpecialIRMAUserLogin extends SpecialRedirectToSpecial {
 }
 
 class IRMAHooks {
-  public static function onSpecialPage_initList( &$list ) {
+/*  public static function onSpecialPage_initList( &$list ) {
     global $wgIRMASmallLogoUrl, $wgSpecialPageGroups;
 
     $wgIRMASmallLogoUrl = self::getIRMASmallLogoUrl();
@@ -38,7 +38,7 @@ class IRMAHooks {
 
     return true;
   }
-
+*/
   /**
    * @param $out OutputPage
    * @param $sk
