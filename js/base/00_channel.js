@@ -1,1 +1,0 @@
-/home/pim/credentials/irma_web_service/WebContent/js/channel.js

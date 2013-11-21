@@ -40,7 +40,8 @@ set_include_path( implode( PATH_SEPARATOR, array( $path ) ) . PATH_SEPARATOR . g
  */
 $wgIRMACookieExpiration = 365 * 24 * 60 * 60;
 
-$wgIRMAWebService = "http://localhost:8080/irma_web_service";
+$wgIRMAWebService = "http://tomcat.demo.irmacard.org/irma_pilot";
+$wgIRMARelayService = "http://tomcat.demo.irmacard.org/irma_web_relay";
 
 # END CONFIGURATION VARIABLES
 

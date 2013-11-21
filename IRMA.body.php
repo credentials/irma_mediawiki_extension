@@ -166,6 +166,7 @@ class SpecialIRMALogin extends SpecialPage {
       throw new ReadOnlyError;
     }
 
+    $this->addIRMASignupHead(); 
     $template = new IRMAUsercreateTemplate();
     $q = 'action=submitsignup&type=signup';
 
@@ -235,24 +236,135 @@ class SpecialIRMALogin extends SpecialPage {
   }
 
   function htmlVerifyButton() {
-    global $wgScriptPath;
+    global $wgIRMAWebService;
 
     return Html::rawElement( 'img',
       array (
         'id' => 'verify',
         'title' => wfMessage('irma-verify-credential')->text(),
-        'src' => "$wgScriptPath/extensions/IRMA/img/IRMAWiki_verifyMember.png"
+        'src' => "$wgIRMAWebService/img/IRMAWiki_verifyMember.png"
       )
     );
+  }
+
+  function addIRMAHeadItems() {
+    global $wgOut, $wgIRMAWebService;
+
+    $wgOut->addHeadItem('IRMA_irma_css', "
+<link href='$wgIRMAWebService/css/wiki_bootstrap.css' rel='stylesheet' type='text/css' />
+<link href='$wgIRMAWebService/css/mosaic.css' rel='stylesheet' type='text/css' />
+<link href='http://fonts.googleapis.com/css?family=Ubuntu' rel='stylesheet' type='text/css'>
+<link href='$wgIRMAWebService/css/irma.css' rel='stylesheet' type='text/css' />
+");
+    $wgOut->addHeadItem('IRMA_irma_js', "
+<script src='$wgIRMAWebService/js/mustache.js' type='text/javascript'></script>
+<script src='$wgIRMAWebService/js/smartcardjs.js' type='text/javascript'></script>
+<script src='$wgIRMAWebService/js/channel.js' type='text/javascript'></script>
+<script src='$wgIRMAWebService/js/ProxyReader.js' type='text/javascript'></script>
+<script src='$wgIRMAWebService/js/bootstrap.min.js' type='text/javascript'></script>
+<script src='$wgIRMAWebService/js/irma.js' type='text/javascript'></script>
+");
+  }
+
+  function addIRMALoginHead() {
+    global $wgOut, $wgIRMAWebService, $wgIRMARelayService;
+    $this->addIRMAHeadItems();
+    $wgOut->addHeadItem('IRMA_verify_js', "
+<script type='text/javascript'>
+  function onDocumentReady() {
+    ProxyReader.channelBaseURL = '$wgIRMARelayService/create';
+    IRMAURL.base = '$wgIRMAWebService';
+    IRMAURL.action = IRMAURL.base + '/protocols/verification/IRMAWiki';
+    IRMAURL.html = IRMAURL.base + '/irma';
+    IRMAURL.img = IRMAURL.base + '/img';
+    IRMAURL.verifierLogo = IRMAURL.base + '/img/IRMAWiki_verifier.png';
+    IRMA.init();
+    IRMA.onBackButtonPressed = function(data) {
+      IRMA.hide_verify();
+    }
+    $('#verify').on('click', function(event) {
+      IRMA.start_verify();
+    });
+  }
+
+  $( document ).ready( onDocumentReady );
+</script>");
+  }
+
+  function addIRMASignupHead() {
+    global $wgOut, $wgIRMAWebService, $wgIRMARelayService;
+    $this->addIRMAHeadItems();
+    $wgOut->addHeadItem('IRMA_issue_js', "
+<script type='text/javascript'>
+  var start_issuance = function(data) {
+    console.log(data);
+    var credentials = data.info.issue_information;
+    console.log(credentials);
+    IRMA.hide_verify();
+    IRMA.start_batch_issue(Object.keys(credentials), issue_url);
+  }
+
+  function onDocumentReady() {
+    ProxyReader.channelBaseURL = '$wgIRMARelayService/create';
+    IRMAURL.base = '$wgIRMAWebService';
+    IRMAURL.action = IRMAURL.base + '/protocols/verification/IRMAWikiRegistration';
+    IRMAURL.html = IRMAURL.base + '/irma';
+    IRMAURL.img = IRMAURL.base + '/img';
+    IRMAURL.verifierLogo = IRMAURL.base + '/img/IRMAWiki_verifier.png';
+    IRMAURL.issuerLogo = IRMAURL.base + '/img/IRMAWiki_issuer.png';
+
+    var path = document.location.pathname;
+    var rootpath = path.substring(0, path.lastIndexOf('/'))
+    IRMA.after_issue_target = rootpath;
+    IRMA.onIssuanceFinished = function() {
+      $('#userlogin2').submit();
+    };
+
+    IRMA.init();
+
+    IRMA.onVerifySuccess = function(data) {
+      console.log(data);
+      var issueData = new Object();
+      issueData.nickname = $('#wpName2').attr('value');
+      issueData.realname = $('#wpRealName').attr('value');
+      console.log(issueData);
+      issue_url = data.result;
+      issue_data = issueData;
+      $.ajax({
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        },
+        url: data.result,
+        data: JSON.stringify(issueData),
+        type: 'POST',
+        success: start_issuance,
+      });
+    }
+
+    IRMA.onBackButtonPressed = function(data) {
+      IRMA.hide_verify();
+      IRMA.hide_issue();
+    }
+
+    $('#wpCreateaccount').on('click', function(event) {
+      IRMA.start_verify();
+      return false;
+    });
+  }
+
+  $( document ).ready( onDocumentReady );
+</script>
+");
   }
 
   /**
    * Displays the main provider selection login form
    */
   function loginForm() {
-    global $wgOut;
+    global $wgOut, $wgIRMAWebService, $wgIRMARelayService;
 
-    $wgOut->addModules('ext.irma.login');
+    $this->addIRMALoginHead(); 
     $wgOut->addHTML($this->htmlVerifyButton());
     $wgOut->addHTML($this->htmlSmartCardJSApplet());
     $wgOut->addWikiMsg( 'irmalogininstructions' );
@@ -268,7 +380,7 @@ class SpecialIRMALogin extends SpecialPage {
 
     $user = User::newFromName( $iwAttributeStore['nickname'] );
     $user->load();
-    $groups = explode(',', $iwAttributeStore['type'])
+    $groups = explode(',', $iwAttributeStore['type']);
     for ($i = 0; i < count($groups); $i++) {
       $group = $groups[$i];
       if ($group !== 'user') {
