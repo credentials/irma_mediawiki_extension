@@ -381,10 +381,10 @@ class SpecialIRMALogin extends SpecialPage {
     $user = User::newFromName( $iwAttributeStore['nickname'] );
     $user->load();
     $groups = explode(',', $iwAttributeStore['type']);
-    for ($i = 0; i < count($groups); $i++) {
+    for ($i = 0; $i < count($groups); $i++) {
       $group = $groups[$i];
       if ($group !== 'user') {
-	$user->setGroup($group);
+	$user->addGroup($group);
       }
     }
     $user->setToken();
