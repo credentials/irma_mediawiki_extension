@@ -266,10 +266,15 @@ class SpecialIRMALogin extends SpecialPage {
 
     $iwAttributeStore = json_decode(file_get_contents("$wgIRMAWebService/attributeStore/$id"), true);
 
-    // Constructs an empty user
     $user = User::newFromName( $iwAttributeStore['nickname'] );
     $user->load();
-    //$user->mId = hexdec( MWCryptRand::generateHex( 8 ) );
+    $groups = explode(',', $iwAttributeStore['type'])
+    for ($i = 0; i < count($groups); $i++) {
+      $group = $groups[$i];
+      if ($group !== 'user') {
+	$user->setGroup($group);
+      }
+    }
     $user->setToken();
     $user->setCookies();
     $user->saveSettings();
