@@ -61,8 +61,21 @@ Error message: "$1"',
 	'irmachoosepassword' => 'Password:',
 	'irmaalreadyloggedin' => 'You are already logged in',
 	'irmaalreadyloggedintext' => "'''You are already logged in, $1!'''",
+	'irmayourname'                   => 'Nickname:',
+	'irmayouremail'                     => 'Email:',
+	'irmayourrealname'                  => 'Real&nbsp;name:',
+	'irmacreateaccountformtitle' => 'Register',
 	'irmaregisterinstructions' => '{{SITENAME}} uses the [//irmacard.org/ IRMA] technology for secure and privacy-friendly authentication on this wiki.',
-	'irmalogininstructions' => '{{SITENAME}} uses the [//irmacard.org/ IRMA] technology for secure and privacy-friendly authentication on this wiki. In order to login, present your IRMA card in order to verify your IRMAwiki credential. If you do not yet have an IRMAwiki credential, [[Special:UserCreate|register]] first.',
+	'irmaprefs-help-realname'           => 'Real name is optional.
+If you choose to provide it, this will be used for giving you attribution for your work.',
+	'irmaprefs-help-realname'           => 'Real name is optional.
+If you choose to provide it, this will be used for giving you attribution for your work.',
+'irmaprefs-help-email'              => '',//'Email address is optional, but is needed for password resets, should you forget your password.',
+'irmaprefs-help-email-others'       => 'Email address is optional. You can choose to let others contact you by email through a link on your user or talk page.
+Your email address is not revealed when other users contact you.',
+'irmaprefs-help-email-required'     => 'Email address is required.',
+
+	'irmalogininstructions' => '{{SITENAME}} uses the [//irmacard.org/ IRMA] technology for secure and privacy-friendly authentication on this wiki. In order to login, present your IRMA card in order to verify your IRMAwiki credential. If you do not yet have an IRMAwiki credential, [[Special:IRMACreate|register]] first.',
 	'prefs-irma' => 'IRMA',
 	'prefs-irma-hide-irma' => 'IRMA URL on your user page',
 	'prefs-irma-userinfo-update-on-login' => 'IRMA user information update',

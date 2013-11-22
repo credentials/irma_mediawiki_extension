@@ -57,13 +57,12 @@ class IRMAUsercreateTemplate extends QuickTemplate {
 <div id="userlogin">
 
 <form name="userlogin2" id="userlogin2" method="post" action="<?php $this->text('action') ?>">
-  <h2><?php $this->msg('createaccount') ?></h2>
+  <h2><?php $this->msg('irmacreateaccountformtitle') ?></h2>
   <p id="userloginlink"><?php $this->html('link') ?></p>
   <?php $this->html('header'); /* pre-table point for form plugins... */ ?>
-  <?php if( $this->haveData( 'languages' ) ) { ?><div id="languagelinks"><p><?php $this->html( 'languages' ); ?></p></div><?php } ?>
   <table>
     <tr>
-      <td class="mw-label"><label for='wpName2'><?php $this->msg('yourname') ?></label></td>
+      <td class="mw-label"><label for='wpName2'><?php $this->msg('irmayourname') ?></label></td>
       <td class="mw-input">
         <?php
       echo Html::input( 'wpName', $this->data['name'], 'text', array(
@@ -76,15 +75,40 @@ class IRMAUsercreateTemplate extends QuickTemplate {
       ) ); ?>
       </td>
     </tr>
+    <tr>
+      <?php if( $this->data['useemail'] ) { ?>
+        <td class="mw-label"><label for='wpEmail'><?php $this->msg('irmayouremail') ?></label></td>
+        <td class="mw-input">
+          <?php
+    echo Html::input( 'wpEmail', $this->data['email'], 'email', array(
+      'class' => 'loginText',
+      'id' => 'wpEmail',
+      'tabindex' => '6',
+      'size' => '20'
+    ) ); ?>
+          <div class="prefsectiontip">
+            <?php  // duplicated in Preferences.php profilePreferences()
+              if( $this->data['emailrequired'] ) {
+                $this->msgWiki('irmaprefs-help-email-required');
+              } else {
+                $this->msgWiki('irmaprefs-help-email');
+              }
+              if( $this->data['emailothers'] ) {
+                $this->msgWiki('irmaprefs-help-email-others');
+              } ?>
+          </div>
+        </td>
+      <?php } ?>
       <?php if( $this->data['userealname'] ) { ?>
+        </tr>
         <tr>
-          <td class="mw-label"><label for='wpRealName'><?php $this->msg('yourrealname') ?></label></td>
+          <td class="mw-label"><label for='wpRealName'><?php $this->msg('irmayourrealname') ?></label></td>
           <td class="mw-input">
             <input type='text' class='loginText' name="wpRealName" id="wpRealName"
               tabindex="7"
               value="<?php $this->text('realname') ?>" size='20' />
             <div class="prefsectiontip">
-              <?php $this->msgWiki('prefs-help-realname'); ?>
+              <?php $this->msgWiki('irmaprefs-help-realname'); ?>
             </div>
           </td>
       <?php } ?>

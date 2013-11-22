@@ -73,11 +73,8 @@ class SpecialIRMALogin extends SpecialPage {
     $this->mReturnTo = $request->getVal( 'returnto', '' );
     $this->mReturnToQuery = $request->getVal( 'returntoquery', '' );
 
-    if( !in_array( 'realname', $wgHiddenPrefs ) ) {
-      $this->mRealName = $request->getText( 'wpRealName' );
-    } else {
-      $this->mRealName = '';
-    }
+    $this->mEmail = $request->getText( 'wpEmail' );
+    $this->mRealName = $request->getText( 'wpRealName' );
 
     # 1. When switching accounts, it sucks to get automatically logged out
     # 2. Do not return to PasswordReset after a successful password change
@@ -191,11 +188,15 @@ class SpecialIRMALogin extends SpecialPage {
 
     $template->set( 'header', '' );
     $template->set( 'name', $this->mUsername );
+    $template->set( 'email', $this->mEmail );
+    $template->set( 'emailrequired', false );
+    $template->set( 'emailothers', true );
     $template->set( 'realname', $this->mRealName );
     $template->set( 'action', $this->getTitle()->getLocalURL( $q ) );
     $template->set( 'message', $msg );
     $template->set( 'messagetype', $msgtype );
-    $template->set( 'userealname', false ); //!in_array( 'realname', $wgHiddenPrefs ) );
+    $template->set( 'userealname', true );
+    $template->set( 'useemail', true );
     $template->set( 'cansecurelogin', ( $wgSecureLogin === true ) );
     $template->set( 'stickHTTPS', $this->mStickHTTPS );
     if ( !self::getCreateaccountToken() ) {
@@ -220,8 +221,8 @@ class SpecialIRMALogin extends SpecialPage {
     }
 
     $out = $this->getOutput();
-    $out->addModules( 'ext.irma.special.userlogin.signup' );
     $out->disallowUserJs(); // just in case...
+    $out->setPageTitle(wfMessage('irmacreateaccount'));
     $out->addTemplate( $template );
     $out->addHTML($this->htmlSmartCardJSApplet());
   }
@@ -332,6 +333,7 @@ class SpecialIRMALogin extends SpecialPage {
       console.log(data);
       var issueData = new Object();
       issueData.nickname = $('#wpName2').attr('value');
+      issueData.email = $('#wpEmail').attr('value');
       issueData.realname = $('#wpRealName').attr('value');
       console.log(issueData);
       issue_url = data.result;
@@ -386,6 +388,8 @@ class SpecialIRMALogin extends SpecialPage {
 
     $user = User::newFromName( $iwAttributeStore['nickname'] );
     $user->load();
+    $user->setEmail( $iwAttributeStore['email'] );
+    $user->setRealName( $iwAttributeStore['realname'] );
     $groups = explode(',', $iwAttributeStore['type']);
     for ($i = 0; $i < count($groups); $i++) {
       $group = $groups[$i];
