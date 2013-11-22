@@ -7,7 +7,7 @@
 
 class SpecialIRMACreateAccount extends SpecialRedirectToSpecial {
   function __construct() {
-    parent::__construct( 'SpecialIRMACreateAccount', 'IRMALogin' );
+    parent::__construct( 'SpecialIRMACreateAccount', 'IRMACreate' );
   }
 }
 
@@ -18,16 +18,14 @@ class SpecialIRMAUserLogin extends SpecialRedirectToSpecial {
 }
 
 class IRMAHooks {
-/*  public static function onSpecialPage_initList( &$list ) {
+  public static function onSpecialPage_initList( &$list ) {
     global $wgIRMASmallLogoUrl, $wgSpecialPageGroups;
 
     $wgIRMASmallLogoUrl = self::getIRMASmallLogoUrl();
 
     $list['UserLogin'] = 'SpecialIRMALogin';
-    $list['CreateAccount'] = 'SpecialIRMALogin/signup';
+    $list['CreateAccount'] = 'SpecialIRMACreate';
 
-    # Special pages are added at global scope;
-    # remove server-related ones if client-only flag is set
     $addList = array( 'Login', 'Create' );
 
     foreach ( $addList as $sp ) {
@@ -38,7 +36,7 @@ class IRMAHooks {
 
     return true;
   }
-*/
+
   /**
    * @param $out OutputPage
    * @param $sk

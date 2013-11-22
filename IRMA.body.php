@@ -38,8 +38,12 @@ class SpecialIRMALogin extends SpecialPage {
   private $mLoaded = false;
   private $mOverrideRequest = null;
 
-  function __construct() {
-    parent::__construct( 'IRMALogin' );
+  function __construct( $name = null ) {
+    if ( $name === null ) {
+      parent::__construct( 'IRMALogin' );
+    } else {
+      parent::__construct( $name );
+    }
   }
 
   /**
@@ -57,7 +61,9 @@ class SpecialIRMALogin extends SpecialPage {
       $request = $this->mOverrideRequest;
     }
 
-    $this->mType = $request->getText( 'type' );
+    if (!isset($this->mType)) {
+      $this->mType = $request->getText( 'type' );
+    }
     $this->mUsername = $request->getText( 'wpName' );
     $this->mPosted = $request->wasPosted();
     $this->mLoginattempt = $request->getCheck( 'wpLoginattempt' );
@@ -189,7 +195,7 @@ class SpecialIRMALogin extends SpecialPage {
     $template->set( 'action', $this->getTitle()->getLocalURL( $q ) );
     $template->set( 'message', $msg );
     $template->set( 'messagetype', $msgtype );
-    $template->set( 'userealname', !in_array( 'realname', $wgHiddenPrefs ) );
+    $template->set( 'userealname', false ); //!in_array( 'realname', $wgHiddenPrefs ) );
     $template->set( 'cansecurelogin', ( $wgSecureLogin === true ) );
     $template->set( 'stickHTTPS', $this->mStickHTTPS );
     if ( !self::getCreateaccountToken() ) {
@@ -915,5 +921,21 @@ class SpecialIRMALogin extends SpecialPage {
 
     $_SESSION['irma_consumer_returnto'] = $returnto;
     $_SESSION['irma_consumer_returntoquery'] = $returntoquery;
+  }
+}
+
+class SpecialIRMACreate extends SpecialIRMALogin {
+  function __construct() {
+    parent::__construct( 'IRMACreate' );
+  }
+
+  function getDescription() {
+    return $this->msg( 'irmacreateaccount' )->text();
+  }
+
+  function execute( $par ) {
+    $this->load();
+    $this->mType = 'signup';
+    parent::execute($par);
   }
 }

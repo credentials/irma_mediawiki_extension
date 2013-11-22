@@ -61,34 +61,11 @@ $wgExtensionMessagesFiles['IRMA'] = $dir . 'IRMA.i18n.php';
 $wgAutoloadClasses['IRMAHooks'] = $dir . 'IRMA.hooks.php';
 $wgAutoloadClasses['SpecialIRMACreateAccount'] = $dir . 'IRMA.hooks.php';
 $wgAutoloadClasses['SpecialIRMAUserLogin'] = $dir . 'IRMA.hooks.php';
-
-# Autoload common parent with utility methods
 $wgAutoloadClasses['SpecialIRMALogin'] = $dir . 'IRMA.body.php';
+$wgAutoloadClasses['SpecialIRMACreate'] = $dir . 'IRMA.body.php';
 
 $wgAutoloadClasses['IRMAUsercreateTemplate'] = $dir . 'templates/Usercreate.php';
 
 $wgHooks['BeforePageDisplay'][] = 'IRMAHooks::onBeforePageDisplay';
-#$wgHooks['SpecialPage_initList'][] = 'IRMAHooks::onSpecialPage_initList';
-
-$myResourceTemplate = array(
-	'localBasePath' => $path,
-	'remoteExtPath' => 'IRMA/',
-	'group' => 'ext.irma',
-);
-
-$wgResourceModules['ext.irma.login'] = $myResourceTemplate + array(
-	'scripts' => 'js/ext.irma.login.js',
-	'styles' => 'css/ext.irma.css',
-	'dependencies' => array(
-		'jquery'
-	)
-);
-
-$wgResourceModules['ext.irma.special.userlogin.signup'] = $myResourceTemplate + array(
-	'scripts' => 'js/ext.irma.signup.js',
-	'styles' => 'css/ext.irma.css',
-	'dependencies' => array(
-		'jquery'
-	)
-);
+$wgHooks['SpecialPage_initList'][] = 'IRMAHooks::onSpecialPage_initList';
 
